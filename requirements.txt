@@ -1,0 +1,4 @@
+ciscoconfparse2==0.9.18
+openai==2.38.0
+pydantic==2.13.4
+python-dotenv==1.2.2
