@@ -19,6 +19,8 @@ COMMAND_WHITELIST: List[str] = [
     "ip access-list",
     "shutdown",
     "ip nat",
+    "permit",
+    "deny",
 ]
 
 
