@@ -275,7 +275,9 @@ The following configuration paths provide the additional context you requested f
 Use this information together with the original configuration path to refine your analysis. Treat these paths as supplementary context only. Do not analyze them independently unless they help explain or validate the currently analyzed configuration path."""
 
 _CONTEXT_PROMPT_CLOSING = """\
-Update your previous reasoning using this additional context. If the new context changes your conclusions, explain why. Otherwise, preserve your previous conclusions and continue the analysis based on the additional information."""
+Update your previous reasoning using this additional context. If the new context changes your conclusions, explain why. Otherwise, preserve your previous conclusions and continue the analysis based on the additional information.
+
+**Important:** If you requested **Reference Provider Context** (type 3) and the section shows **"Nothing found"**, this means the referenced configuration object(s) are confirmed **not defined** anywhere in the configuration. This is a definitive absence."""
 
 # Section definitions: (title, description)
 _SECTION_DEFINITIONS: dict[int, tuple[str, str]] = {
