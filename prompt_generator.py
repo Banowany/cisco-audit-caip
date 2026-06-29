@@ -20,7 +20,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from config_path_neighbor_finder import find_neighbors
-from config_path_reference_finder import find_reference_related
+from config_path_reference_finder import find_reference_consumers, find_reference_related
 from config_path_similar_finder import find_similar
 from models import ParsedCiscoConfigPath
 
@@ -34,7 +34,7 @@ class AuditResponse(BaseModel):
 
     Attributes:
         action: Either ``"request_context"`` or ``"complete_analysis"``.
-        requestedInfo: A list of integers ``[1, 2, 3]`` indicating which
+        requestedInfo: A list of integers ``[1, 2, 3, 4]`` indicating which
             context types are needed (only relevant when action is
             ``"request_context"``).
         hasIssue: ``True``, ``False``, or ``None`` (only relevant when action
@@ -108,6 +108,10 @@ If additional context is required, you may request one or more of the following:
 
 * Useful for verifying whether referenced configuration objects (e.g., ACLs, prefix-lists, route-maps, policy objects) are actually defined.
 
+**(4) Reference Consumer Paths**
+
+* Useful for verifying whether configuration objects defined by the currently analyzed path are actually used (consumed) elsewhere in the configuration.
+
 ## Response Format
 
 Respond **only** with a valid JSON object having the following structure:
@@ -132,7 +136,7 @@ Respond **only** with a valid JSON object having the following structure:
 #### `requestedInfo`
 
 * Used only when `action` is `"request_context"`.
-* Contains one or more values selected only from `[1, 2, 3]`.
+* Contains one or more values selected only from `[1, 2, 3, 4]`.
 * Leave empty when `action` is `"complete_analysis"`.
 
 #### `hasIssue`
@@ -267,6 +271,32 @@ interface GigabitEthernet0/0 --> duplex auto
   "parameter": [],
   "reason": []
 }
+```
+
+---
+
+### Example 5 – Reference Consumer Context Required
+
+**Configuration Path**
+
+```text
+access-list 100 permit ip any any
+```
+
+**Output**
+
+```json
+{
+  "action": "request_context",
+  "requestedInfo": [
+    4
+  ],
+  "hasIssue": null,
+  "parameter": [],
+  "reason": [
+    "The ACL defined by this path must be verified to determine whether it is actually referenced by any other configuration path. This is required to evaluate a potential Structural & Reference Error (defined but never referenced)."
+  ]
+}
 ```"""
 
 _CONTEXT_PROMPT_INTRO = """\
@@ -277,7 +307,9 @@ Use this information together with the original configuration path to refine you
 _CONTEXT_PROMPT_CLOSING = """\
 Update your previous reasoning using this additional context. If the new context changes your conclusions, explain why. Otherwise, preserve your previous conclusions and continue the analysis based on the additional information.
 
-**Important:** If you requested **Reference Provider Context** (type 3) and the section shows **"Nothing found"**, this means the referenced configuration object(s) are confirmed **not defined** anywhere in the configuration. This is a definitive absence."""
+**Important:** If you requested **Reference Provider Context** (type 3) and the section shows **"Nothing found"**, this means the referenced configuration object(s) are confirmed **not defined** anywhere in the configuration. This is a definitive absence.
+
+**Important:** If you requested **Reference Consumer Context** (type 4) and the section shows **"Nothing found"**, this means the configuration object(s) defined by the currently analyzed path are **not consumed** by any other path in the configuration. This may indicate unused (orphan) configuration objects."""
 
 # Section definitions: (title, description)
 _SECTION_DEFINITIONS: dict[int, tuple[str, str]] = {
@@ -297,12 +329,18 @@ _SECTION_DEFINITIONS: dict[int, tuple[str, str]] = {
         "These paths define configuration objects that may be referenced by "
         "the currently analyzed configuration path.",
     ),
+    4: (
+        "Reference Consumer Context",
+        "These paths reference (consume) configuration objects defined by "
+        "the currently analyzed configuration path.",
+    ),
 }
 
 _FETCH_FUNCTIONS: dict[int, callable] = {
     1: find_neighbors,
     2: find_similar,
     3: find_reference_related,
+    4: find_reference_consumers,
 }
 
 
@@ -334,7 +372,7 @@ def _format_path_list(paths: List[ParsedCiscoConfigPath]) -> str:
 
 
 _SUMMARIZATION_PROMPT_TEMPLATE = """\
-You are a senior Cisco IOS auditor tasked with reconciling two independent analyses of the same configuration path.
+You are a senior Cisco IOS auditor. Below is a configuration path and two prior analysis results. Review them, then produce your own final consolidated analysis.
 
 **Configuration Path Under Review:**
 
@@ -342,17 +380,11 @@ You are a senior Cisco IOS auditor tasked with reconciling two independent analy
 {{CONFIG_PATH}}
 ```
 
-Below are two independent audit results for this configuration path. Your job is to review both, resolve any disagreements, and produce a single final consolidated analysis.
-
----
-
-### Analysis from Model 1
+**Prior Analysis Results:**
 
 ```json
 {{ANALYSIS_1}}
 ```
-
-### Analysis from Model 2
 
 ```json
 {{ANALYSIS_2}}
@@ -360,17 +392,9 @@ Below are two independent audit results for this configuration path. Your job is
 
 ## Instructions
 
-1. **Compare** both analyses carefully. Pay close attention to differences in:
-   - `hasIssue` (true vs false)
-   - `parameter` lists (which parameters are flagged as problematic)
-   - `reason` explanations
-
-2. **Resolve disagreements** based on the strength of reasoning provided. Consider:
-   - Does one analysis provide more specific or technically accurate reasoning?
-   - Does one analysis identify issues the other missed?
-   - Is there a clear technical reason to prefer one conclusion over the other?
-
-3. **Produce a single consolidated result** using the same JSON format as the individual analyses.
+1. Review both prior analyses as input data.
+2. Perform your own complete analysis of the configuration path itself.
+3. Produce a single final result in the JSON format specified below.
 
 ## Response Format
 
@@ -399,7 +423,7 @@ Respond **only** with a valid JSON object having the following structure:
 * Contains only configuration parameters that are confirmed to be problematic.
 
 #### `reason`
-* Explain the final conclusion, noting any disagreements between the two analyses and why the chosen conclusion is preferred.
+* Explain the final conclusion in your own words, addressing the specific issues found.
 
 ## Output Requirements
 
@@ -582,8 +606,17 @@ if __name__ == "__main__":
     print(f"    → Preview:\n{'-' * 60}")
     print(cp2[:600] + "\n...\n")
 
-    # ── 5. Context: requestedInfo=[2] ────────────────────────────────────────
-    print(f"[5] Simulated LLM response: requestedInfo=[2] (similar only)")
+    # ── 5. Context: requestedInfo=[4] ────────────────────────────────────────
+    print(f"[5] Simulated LLM response: requestedInfo=[4] (reference consumers only)")
+    r5 = AuditResponse(action="request_context", requestedInfo=[4])
+    cp5 = prepare_context_prompt(r5, first, parsed)
+    print(f"    → Prompt length: {len(cp5)} characters")
+    print(f"    → Full output:\n{'-' * 60}")
+    print(cp5)
+    print()
+
+    # ── 6. Context: requestedInfo=[2] ────────────────────────────────────────
+    print(f"[6] Simulated LLM response: requestedInfo=[2] (similar only)")
     r3 = AuditResponse(action="request_context", requestedInfo=[2])
     cp3 = prepare_context_prompt(r3, first, parsed)
     print(f"    → Prompt length: {len(cp3)} characters")
@@ -591,15 +624,15 @@ if __name__ == "__main__":
     print(cp3)
     print()
 
-    # ── 6. Parse a complete_analysis response ─────────────────────────────────
-    print(f"[6] Simulated LLM response: complete_analysis")
-    r4 = AuditResponse(
+    # ── 7. Parse a complete_analysis response ─────────────────────────────────
+    print(f"[7] Simulated LLM response: complete_analysis")
+    r6 = AuditResponse(
         action="complete_analysis",
         hasIssue=True,
         parameter=["ip address"],
         reason=["CIDR notation is not valid Cisco IOS syntax."],
     )
-    print(f"    → Parsed AuditResponse: {r4.model_dump_json(indent=2)}")
+    print(f"    → Parsed AuditResponse: {r6.model_dump_json(indent=2)}")
 
     print(f"\n{'=' * 72}")
     print("  All smoke tests passed successfully!")
