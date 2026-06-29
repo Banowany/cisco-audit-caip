@@ -330,6 +330,85 @@ def _format_path_list(paths: List[ParsedCiscoConfigPath]) -> str:
     return "\n".join(lines)
 
 
+# ── Summarization Prompt ──────────────────────────────────────────────────────
+
+
+_SUMMARIZATION_PROMPT_TEMPLATE = """\
+You are a senior Cisco IOS auditor tasked with reconciling two independent analyses of the same configuration path.
+
+**Configuration Path Under Review:**
+
+```text
+{{CONFIG_PATH}}
+```
+
+Below are two independent audit results for this configuration path. Your job is to review both, resolve any disagreements, and produce a single final consolidated analysis.
+
+---
+
+### Analysis from Model 1
+
+```json
+{{ANALYSIS_1}}
+```
+
+### Analysis from Model 2
+
+```json
+{{ANALYSIS_2}}
+```
+
+## Instructions
+
+1. **Compare** both analyses carefully. Pay close attention to differences in:
+   - `hasIssue` (true vs false)
+   - `parameter` lists (which parameters are flagged as problematic)
+   - `reason` explanations
+
+2. **Resolve disagreements** based on the strength of reasoning provided. Consider:
+   - Does one analysis provide more specific or technically accurate reasoning?
+   - Does one analysis identify issues the other missed?
+   - Is there a clear technical reason to prefer one conclusion over the other?
+
+3. **Produce a single consolidated result** using the same JSON format as the individual analyses.
+
+## Response Format
+
+Respond **only** with a valid JSON object having the following structure:
+
+```json
+{
+  "action": "complete_analysis",
+  "requestedInfo": [],
+  "hasIssue": true,
+  "parameter": [],
+  "reason": []
+}
+```
+
+### Field Definitions
+
+#### `action`
+* Must be `"complete_analysis"` — you have all the information needed to produce the final result.
+
+#### `hasIssue`
+* `true` if one or more configuration issues are confirmed.
+* `false` if no configuration issues are found.
+
+#### `parameter`
+* Contains only configuration parameters that are confirmed to be problematic.
+
+#### `reason`
+* Explain the final conclusion, noting any disagreements between the two analyses and why the chosen conclusion is preferred.
+
+## Output Requirements
+
+* Produce **only** the JSON object.
+* Do not output Markdown.
+* Do not output explanatory text outside the JSON object.
+* Populate only the fields relevant to the selected `action`; unused fields should remain empty as specified above."""
+
+
 # ── Public Methods ────────────────────────────────────────────────────────────
 
 
@@ -403,6 +482,40 @@ def prepare_context_prompt(
     parts.append(_CONTEXT_PROMPT_CLOSING)
 
     return "\n\n".join(parts)
+
+
+def prepare_summarization_prompt(
+    path: ParsedCiscoConfigPath,
+    analysis_1: AuditResponse,
+    analysis_2: AuditResponse,
+) -> str:
+    """
+    Build a prompt for the summarizer model that reconciles two independent
+    audit results into a single consolidated :class:`AuditResponse`.
+
+    Args:
+        path:
+            The parsed configuration path that was audited.
+        analysis_1:
+            The :class:`AuditResponse` from the first analysis model.
+        analysis_2:
+            The :class:`AuditResponse` from the second analysis model.
+
+    Returns:
+        A fully formatted summarization prompt string with placeholders
+        replaced by the actual config path and the two JSON responses.
+    """
+    display_path = _path_to_display(path)
+    prompt = _SUMMARIZATION_PROMPT_TEMPLATE.replace("{{CONFIG_PATH}}", display_path)
+    prompt = prompt.replace(
+        "{{ANALYSIS_1}}",
+        analysis_1.model_dump_json(indent=2),
+    )
+    prompt = prompt.replace(
+        "{{ANALYSIS_2}}",
+        analysis_2.model_dump_json(indent=2),
+    )
+    return prompt
 
 
 # ── Smoke Demo ────────────────────────────────────────────────────────────────

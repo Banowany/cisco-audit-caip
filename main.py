@@ -37,7 +37,7 @@ from config_path_parser import parse_config_paths
 import reference_consumers  # noqa: F401 — registers reference consumers
 import reference_providers  # noqa: F401 — registers reference providers
 
-from audit_engine import audit_single_path
+from audit_engine import audit_single_path_ensemble
 from prompt_generator import AuditResponse
 
 _logger = logging.getLogger(__name__)
@@ -106,7 +106,7 @@ def main() -> None:
         start_time = time.monotonic()
 
         try:
-            response: AuditResponse = audit_single_path(path, parsed_paths)
+            response: AuditResponse = audit_single_path_ensemble(path, parsed_paths)
         except RuntimeError as exc:
             _logger.error("[%d/%d] Audit failed for: %s — %s", idx, total, path_summary, exc)
             response = AuditResponse(
