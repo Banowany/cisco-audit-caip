@@ -13,6 +13,9 @@ from models import CiscoConfigPath
 
 COMMAND_WHITELIST: List[str] = [
     "interface",
+    "router ospf",
+    "network",
+    "ip route",
     "ip address",
     "ip access-group",
     "access-list",

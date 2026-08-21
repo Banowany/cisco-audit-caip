@@ -60,6 +60,29 @@ def parse_interface(m: Match[str]) -> ParsedLine:
     return ParsedLine(command="interface", arguments=[m.group(1)], is_started_with_no=False)
 
 
+@register(r"^router ospf (\S+)$")
+def parse_router_ospf(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="router ospf", arguments=[m.group(1)], is_started_with_no=False)
+
+
+@register(r"^network (\S+) (\S+) area (\S+)$")
+def parse_network_area(m: Match[str]) -> ParsedLine:
+    return ParsedLine(
+        command="network",
+        arguments=[m.group(1), m.group(2), "area", m.group(3)],
+        is_started_with_no=False,
+    )
+
+
+@register(r"^ip route (\S+) (\S+) (\S+)$")
+def parse_ip_route(m: Match[str]) -> ParsedLine:
+    return ParsedLine(
+        command="ip route",
+        arguments=[m.group(1), m.group(2), m.group(3)],
+        is_started_with_no=False,
+    )
+
+
 @register(r"^ip address (\S+) (\S+)$")
 def parse_ip_address(m: Match[str]) -> ParsedLine:
     return ParsedLine(command="ip address", arguments=[m.group(1), m.group(2)], is_started_with_no=False)
