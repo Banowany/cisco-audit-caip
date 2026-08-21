@@ -83,6 +83,49 @@ def parse_ip_route(m: Match[str]) -> ParsedLine:
     )
 
 
+@register(r"^service password-encryption$")
+def parse_service_password_encryption(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="service password-encryption", arguments=[], is_started_with_no=False)
+
+
+@register(r"^enable password (.+)$")
+def parse_enable_password(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="enable password", arguments=[m.group(1)], is_started_with_no=False)
+
+
+@register(r"^enable secret (.+)$")
+def parse_enable_secret(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="enable secret", arguments=[m.group(1)], is_started_with_no=False)
+
+
+@register(r"^line (\S+)(?: (.+))?$")
+def parse_line(m: Match[str]) -> ParsedLine:
+    args = [m.group(1)]
+    if m.group(2):
+        args.extend(m.group(2).split())
+    return ParsedLine(command="line", arguments=args, is_started_with_no=False)
+
+
+@register(r"^password (.+)$")
+def parse_password(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="password", arguments=[m.group(1)], is_started_with_no=False)
+
+
+@register(r"^login$")
+def parse_login(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="login", arguments=[], is_started_with_no=False)
+
+
+@register(r"^transport input (.+)$")
+def parse_transport_input(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="transport input", arguments=m.group(1).split(), is_started_with_no=False)
+
+
+@register(r"^access-class (\S+) (in|out)$")
+def parse_access_class(m: Match[str]) -> ParsedLine:
+    return ParsedLine(command="access-class", arguments=[m.group(1), m.group(2)], is_started_with_no=False)
+
+
 @register(r"^ip address (\S+) (\S+)$")
 def parse_ip_address(m: Match[str]) -> ParsedLine:
     return ParsedLine(command="ip address", arguments=[m.group(1), m.group(2)], is_started_with_no=False)
