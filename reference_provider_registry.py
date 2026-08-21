@@ -4,22 +4,24 @@ reference_provider_registry.py
 A decorator-based registry for Reference Provider command handlers.
 
 Each handler is decorated with ``@register(command)`` and must accept a single
-``arguments`` parameter (a list of strings) and return ``list[tuple[str, str]]``
+``arguments`` parameter (a list of strings) and return ``list[ReferenceKey]``
 representing the reference values provided by the command.
 
 Example::
 
     @register("access-list")
-    def provide_access_list(arguments: List[str]) -> List[Tuple[str, str]]:
+    def provide_access_list(arguments: List[str]) -> List[ReferenceKey]:
         # arguments == ["100", "permit", "ip", "any", "any"]
         return [("access-list", arguments[0])]
 """
 
 from typing import Callable, List, Tuple
 
+from models import ReferenceKey
+
 # Type alias for a provider handler.
 # Accepts the arguments from a ParsedLine, returns a list of (type, value) tuples.
-ProviderHandler = Callable[[List[str]], List[Tuple[str, str]]]
+ProviderHandler = Callable[[List[str]], List[ReferenceKey]]
 
 _REGISTRY: List[Tuple[str, ProviderHandler]] = []
 
@@ -30,7 +32,7 @@ def register(command: str) -> Callable[[ProviderHandler], ProviderHandler]:
     given *command*.
 
     The decorated function must accept a single ``arguments: List[str]``
-    parameter and return ``list[tuple[str, str]]``.
+    parameter and return ``list[ReferenceKey]``.
 
     Args:
         command: The command string (e.g. ``"access-list"``) that this handler

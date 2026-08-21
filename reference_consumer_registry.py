@@ -4,22 +4,24 @@ reference_consumer_registry.py
 A decorator-based registry for Reference Consumer command handlers.
 
 Each handler is decorated with ``@register(command)`` and must accept a single
-``arguments`` parameter (a list of strings) and return ``list[tuple[str, str]]``
+``arguments`` parameter (a list of strings) and return ``list[ReferenceKey]``
 representing the reference values consumed by the command.
 
 Example::
 
     @register("ip access-group")
-    def consume_ip_access_group(arguments: List[str]) -> List[Tuple[str, str]]:
+    def consume_ip_access_group(arguments: List[str]) -> List[ReferenceKey]:
         # arguments == ["100", "in"]
         return [("access-list", arguments[0])]
 """
 
 from typing import Callable, List, Tuple
 
+from models import ReferenceKey
+
 # Type alias for a consumer handler.
 # Accepts the arguments from a ParsedLine, returns a list of (type, value) tuples.
-ConsumerHandler = Callable[[List[str]], List[Tuple[str, str]]]
+ConsumerHandler = Callable[[List[str]], List[ReferenceKey]]
 
 _REGISTRY: List[Tuple[str, ConsumerHandler]] = []
 
@@ -30,7 +32,7 @@ def register(command: str) -> Callable[[ConsumerHandler], ConsumerHandler]:
     given *command*.
 
     The decorated function must accept a single ``arguments: List[str]``
-    parameter and return ``list[tuple[str, str]]``.
+    parameter and return ``list[ReferenceKey]``.
 
     Args:
         command: The command string (e.g. ``"ip access-group"``) that this

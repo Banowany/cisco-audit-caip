@@ -21,12 +21,7 @@ Examples
 - ``["access-list 101 permit ip any any"]`` → ``("access-list", "access-list")``
 """
 
-from typing import Tuple
-
-from models import ParsedCiscoConfigPath
-
-
-SimilarKey = Tuple[str, str]
+from models import ParsedCiscoConfigPath, SimilarKey
 
 
 def generate_similar_key(path: ParsedCiscoConfigPath) -> SimilarKey:

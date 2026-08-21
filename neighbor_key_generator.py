@@ -21,10 +21,10 @@ ACL are grouped together even though there is no parent interface/block.
 
 from typing import Optional
 
-from models import ParsedCiscoConfigPath
+from models import NeighborKey, ParsedCiscoConfigPath
 
 
-def generate_neighbor_key(path: ParsedCiscoConfigPath) -> Optional[str]:
+def generate_neighbor_key(path: ParsedCiscoConfigPath) -> Optional[NeighborKey]:
     """
     Produce the Neighbor Key for a parsed configuration path.
 

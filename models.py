@@ -1,5 +1,10 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional, Tuple
+
+
+NeighborKey = str
+SimilarKey = Tuple[str, str]
+ReferenceKey = Tuple[str, str]
 
 
 class CiscoConfigPath(BaseModel):

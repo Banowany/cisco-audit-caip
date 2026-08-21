@@ -14,16 +14,16 @@ command in the appropriate registry, and collects all returned reference
 tuples.
 """
 
-from typing import List, Tuple
+from typing import List
 
-from models import ParsedCiscoConfigPath
+from models import ParsedCiscoConfigPath, ReferenceKey
 from reference_consumer_registry import get_consumer_handlers
 from reference_provider_registry import get_provider_handlers
 
 
 def extract_consumer_refs(
     path: ParsedCiscoConfigPath,
-) -> List[Tuple[str, str]]:
+) -> List[ReferenceKey]:
     """
     Extract all reference values that the given *path* **consumes**.
 
@@ -39,7 +39,7 @@ def extract_consumer_refs(
         consumed.
     """
     handlers = dict(get_consumer_handlers())
-    references: List[Tuple[str, str]] = []
+    references: List[ReferenceKey] = []
 
     for parsed_line in path.parsed_lines:
         handler = handlers.get(parsed_line.command)
@@ -51,7 +51,7 @@ def extract_consumer_refs(
 
 def extract_provider_refs(
     path: ParsedCiscoConfigPath,
-) -> List[Tuple[str, str]]:
+) -> List[ReferenceKey]:
     """
     Extract all reference values that the given *path* **provides**.
 
@@ -67,7 +67,7 @@ def extract_provider_refs(
         provided.
     """
     handlers = dict(get_provider_handlers())
-    references: List[Tuple[str, str]] = []
+    references: List[ReferenceKey] = []
 
     for parsed_line in path.parsed_lines:
         handler = handlers.get(parsed_line.command)

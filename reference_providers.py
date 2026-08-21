@@ -12,13 +12,30 @@ providers.
 """
 
 from ipaddress import IPv4Address, IPv4Network
-from typing import List, Tuple
+from typing import List
 
+from models import ReferenceKey
 from reference_provider_registry import register
 
 
+@register("interface")
+def provide_interface(arguments: List[str]) -> List[ReferenceKey]:
+    """
+    ``interface <name>`` provides an interface reference.
+
+    Args:
+        arguments: The parsed arguments, e.g. ``["GigabitEthernet0/1"]``.
+
+    Returns:
+        A list with a single ``("interface", <name>)`` tuple.
+    """
+    if not arguments:
+        return []
+    return [("interface", arguments[0])]
+
+
 @register("access-list")
-def provide_access_list(arguments: List[str]) -> List[Tuple[str, str]]:
+def provide_access_list(arguments: List[str]) -> List[ReferenceKey]:
     """
     ``access-list <acl-id> (remark|deny|permit) ...`` provides an Access List
     reference.
@@ -36,7 +53,7 @@ def provide_access_list(arguments: List[str]) -> List[Tuple[str, str]]:
 
 
 @register("ip access-list")
-def provide_ip_access_list(arguments: List[str]) -> List[Tuple[str, str]]:
+def provide_ip_access_list(arguments: List[str]) -> List[ReferenceKey]:
     """
     ``ip access-list (extended|standard) <acl-name>`` provides an Access List
     reference.
@@ -53,7 +70,7 @@ def provide_ip_access_list(arguments: List[str]) -> List[Tuple[str, str]]:
 
 
 @register("ip address")
-def provide_ip_address(arguments: List[str]) -> List[Tuple[str, str]]:
+def provide_ip_address(arguments: List[str]) -> List[ReferenceKey]:
     """
     ``ip address <ip> <mask>`` provides a network reference.
 
