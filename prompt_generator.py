@@ -429,6 +429,7 @@ Respond **only** with a valid JSON object having the following structure:
 
 * Produce **only** the JSON object.
 * Do not output Markdown.
+* Do not wrap JSON in triple backticks or code fences.
 * Do not output explanatory text outside the JSON object.
 * Populate only the fields relevant to the selected `action`; unused fields should remain empty as specified above."""
 

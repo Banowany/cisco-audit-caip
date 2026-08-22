@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from typing import Any
 
 from dotenv import load_dotenv
@@ -29,6 +30,29 @@ _logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _DEFAULT_MODEL = "openai/gpt-5.4-nano"
+
+
+def _normalize_audit_response_json(raw: str) -> str:
+    """
+    Normalize model output to a plain JSON object string.
+
+    Handles common formatting drift where the model wraps JSON in markdown
+    code fences or adds short prose around the JSON object.
+    """
+    text = raw.strip()
+
+    # Case 1: fenced code block (```json ... ``` or ``` ... ```)
+    fence_match = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.IGNORECASE | re.DOTALL)
+    if fence_match:
+        text = fence_match.group(1).strip()
+
+    # Case 2: extra leading/trailing text around JSON object
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and start < end:
+        text = text[start:end + 1].strip()
+
+    return text
 
 # ---------------------------------------------------------------------------
 # Conversation class
@@ -177,10 +201,11 @@ class OpenRouterConversation:
             valid :class:`~prompt_generator.AuditResponse`.
         """
         raw = self.send_prompt_raw(prompt)
+        normalized = _normalize_audit_response_json(raw)
 
         # Parse & validate
         try:
-            return AuditResponse.model_validate_json(raw)
+            return AuditResponse.model_validate_json(normalized)
         except Exception as exc:
             _logger.warning(
                 "Failed to parse LLM response as AuditResponse. "
