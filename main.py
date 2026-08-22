@@ -30,6 +30,7 @@ import logging
 import os
 import sys
 import time
+from pathlib import Path
 
 from config_path_extractor import extract_config_paths
 from config_path_filter import filter_paths_by_whitelist
@@ -42,6 +43,39 @@ from prompt_generator import AuditResponse
 
 _logger = logging.getLogger(__name__)
 
+_LOG_LEVELS = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
+
+def _configure_logging(console_level_name: str, log_file: str | None) -> None:
+    """Configure console and optional file logging handlers."""
+    console_level = _LOG_LEVELS.get(console_level_name.upper(), logging.INFO)
+
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
+
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(console_level)
+    console_handler.setFormatter(formatter)
+    root.addHandler(console_handler)
+
+    if log_file:
+        log_path = Path(log_file)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        file_handler = logging.FileHandler(log_path, encoding="utf-8")
+        # File always captures all levels for offline troubleshooting.
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(formatter)
+        root.addHandler(file_handler)
+
 
 # ---------------------------------------------------------------------------
 # CLI
@@ -49,12 +83,6 @@ _logger = logging.getLogger(__name__)
 
 
 def main() -> None:
-    # ── Logging setup ───────────────────────────────────────────────────────
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(levelname)s | %(name)s | %(message)s",
-    )
-
     # ── Parse arguments ─────────────────────────────────────────────────────
     parser = argparse.ArgumentParser(
         description="Audit Cisco IOS configuration for issues using an LLM."
@@ -72,7 +100,24 @@ def main() -> None:
             "as the config file."
         ),
     )
+    parser.add_argument(
+        "--log-file",
+        default=None,
+        help=(
+            "Optional path to write detailed logs. "
+            "When set, this file captures all levels including DEBUG."
+        ),
+    )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Console log level (default: INFO).",
+    )
     args = parser.parse_args()
+
+    # ── Logging setup ───────────────────────────────────────────────────────
+    _configure_logging(args.log_level, args.log_file)
 
     config_file = args.config_file
     output_file = args.output

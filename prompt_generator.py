@@ -372,7 +372,7 @@ def _format_path_list(paths: List[ParsedCiscoConfigPath]) -> str:
 
 
 _SUMMARIZATION_PROMPT_TEMPLATE = """\
-You are a senior Cisco IOS auditor. Below is a configuration path and two prior analysis results. Review them, then produce your own final consolidated analysis.
+You are a reconciliation layer for two Cisco IOS audit models. Your job is not to independently re-audit the configuration from scratch. Your task is to aggregate the two prior model results into one final decision.
 
 **Configuration Path Under Review:**
 
@@ -392,9 +392,14 @@ You are a senior Cisco IOS auditor. Below is a configuration path and two prior 
 
 ## Instructions
 
-1. Review both prior analyses as input data.
-2. Perform your own complete analysis of the configuration path itself.
-3. Produce a single final result in the JSON format specified below.
+1. Treat the two prior analyses as the only evidence you may use.
+2. Do not invent new findings that are not supported by either prior analysis.
+3. Do not perform a separate independent audit of the configuration path itself.
+4. Use the model outputs as the authoritative decision input.
+5. If both analyses agree that there is no issue, the final result must be `hasIssue: false`.
+6. If both analyses agree that there is an issue, the final result must be `hasIssue: true`.
+7. If they disagree, reconcile by selecting the conclusion most strongly supported by the evidence and explain the disagreement briefly in `reason`.
+8. The final result must still be a valid JSON object in the format below.
 
 ## Response Format
 
@@ -413,17 +418,17 @@ Respond **only** with a valid JSON object having the following structure:
 ### Field Definitions
 
 #### `action`
-* Must be `"complete_analysis"` — you have all the information needed to produce the final result.
+* Must be `"complete_analysis"`.
 
 #### `hasIssue`
-* `true` if one or more configuration issues are confirmed.
-* `false` if no configuration issues are found.
+* `true` only when the combined evidence from both prior analyses supports an issue.
+* `false` when the combined evidence supports no issue.
 
 #### `parameter`
-* Contains only configuration parameters that are confirmed to be problematic.
+* Only include parameters that are supported by the prior analyses.
 
 #### `reason`
-* Explain the final conclusion in your own words, addressing the specific issues found.
+* Explain the final conclusion in terms of the prior analyses and their agreement/disagreement.
 
 ## Output Requirements
 

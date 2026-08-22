@@ -156,6 +156,12 @@ class OpenRouterConversation:
         RuntimeError
             If the API call fails.
         """
+        _logger.debug(
+            "Model=%s | Prompt start\n%s\nPrompt end",
+            self._model,
+            prompt,
+        )
+
         # 1. Append user message
         self.messages.append({"role": "user", "content": prompt})
 
@@ -170,6 +176,12 @@ class OpenRouterConversation:
         # 3. Store raw output and append assistant response to history
         self._last_raw = raw
         self.messages.append({"role": "assistant", "content": raw})
+
+        _logger.debug(
+            "Model=%s | Raw response start\n%s\nRaw response end",
+            self._model,
+            raw,
+        )
 
         return raw
 
@@ -211,6 +223,11 @@ class OpenRouterConversation:
                 "Failed to parse LLM response as AuditResponse. "
                 "Raw content: %.200s",
                 raw,
+            )
+            _logger.debug(
+                "Model=%s | Normalized response candidate\n%s",
+                self._model,
+                normalized,
             )
             raise RuntimeError(
                 f"LLM response could not be parsed as AuditResponse: {exc}"

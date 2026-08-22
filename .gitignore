@@ -1,3 +1,59 @@
 .venv/
 __pycache__/
 .env
+
+# LaTeX / thesis artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+*.run.xml
+*.xdv
+*.lof
+*.lot
+*.idx
+*.ilg
+*.ind
+*.nav
+*.snm
+*.vrb
+*.ptc
+*.gz
+*.tex.bak
+*.bak
+*.tex
+
+# Generated analysis outputs
+*.audit.json
+**/*.audit.json
+**/analyze.log
+**/*.log
+**/logs/
+logs/
+
+# Temporary / local run outputs
+results/
+out/
+output/
+reports/
+coverage/
+*.tmp
+*.temp
+
+# Helper scripts and local automation files
+run_test_cases_parallel.sh
+run_with_logs_template.sh
+run_with_logs_template.py
+*.sh
+
+# IDE/editor files
+.vscode/
+.idea/
+.DS_Store
