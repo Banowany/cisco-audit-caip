@@ -1,0 +1,47 @@
+hasIssue=false | no service password-encryption
+why: Not part of the planned attribute or local conflict errors in this scenario.
+
+hasIssue=false | interface GigabitEthernet0/0 ->  ip address 10.1.1.1 255.255.255.0
+why: No planned attribute or local conflict.
+
+hasIssue=false | interface GigabitEthernet0/0 ->  ip nat inside
+why: This is valid context for NAT, but is not itself the planned error.
+
+hasIssue=false | interface GigabitEthernet0/1 ->  ip address 10.2.2.1 255.255.255.0
+why: No planned attribute or local conflict.
+
+hasIssue=false | interface GigabitEthernet0/1 ->  ip nat inside
+why: This is valid context for NAT, but is not itself the planned error.
+
+hasIssue=false | interface GigabitEthernet0/2 ->  ip address 192.168.20.1 255.255.255.0
+why: The address assignment is valid; it is context for the conflicts caused by the separate shutdown command.
+
+hasIssue=true | interface GigabitEthernet0/2 ->  shutdown
+why: The interface associated with the OSPF network and default route is administratively disabled.
+
+hasIssue=false | interface Vlan1 ->  no ip address
+why: No planned attribute or local conflict.
+
+hasIssue=false | interface Vlan1 ->  shutdown
+why: No planned attribute or local conflict.
+
+hasIssue=true | router ospf 1 ->  network 192.168.20.0 0.0.0.255 area 0
+why: OSPF advertises a network associated with an administratively disabled interface.
+
+hasIssue=true | ip nat inside source list 1 interface GigabitEthernet0/2 overload
+why: NAT configuration is incomplete because no interface has ip nat outside.
+
+hasIssue=true | ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/2 
+why: Default route points to the administratively disabled GigabitEthernet0/2.
+
+hasIssue=false | access-list 1 permit 10.1.1.0 0.0.0.255
+why: The ACL is valid context for NAT and is not itself a planned error.
+
+hasIssue=false | line con 0
+why: No planned attribute or local conflict.
+
+hasIssue=false | line aux 0
+why: No planned attribute or local conflict.
+
+hasIssue=false | line vty 0 4 ->  login
+why: No planned attribute or local conflict.

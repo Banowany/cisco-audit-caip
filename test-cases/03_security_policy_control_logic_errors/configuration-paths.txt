@@ -1,0 +1,16 @@
+no service password-encryption | yes
+enable password cisco | yes
+interface GigabitEthernet0/0 ->  ip address 192.168.10.1 255.255.255.0 | no
+interface GigabitEthernet0/1 ->  ip address 192.168.20.1 255.255.255.0 | no
+interface GigabitEthernet0/1 ->  ip access-group 110 in | no
+interface GigabitEthernet0/2 ->  no ip address | no
+interface GigabitEthernet0/2 ->  shutdown | no
+interface Vlan1 ->  no ip address | no
+interface Vlan1 ->  shutdown | no
+access-list 110 permit ip any any | ?
+access-list 110 deny tcp any any eq 22 | ?
+line con 0 ->  password admin123 
+line con 0 ->  login
+line aux 0
+line vty 0 4 ->  password telnet123
+line vty 0 4 ->  login

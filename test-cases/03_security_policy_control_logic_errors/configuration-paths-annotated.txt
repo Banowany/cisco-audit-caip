@@ -1,0 +1,47 @@
+hasIssue=true | no service password-encryption
+why: Password encryption is disabled, so line passwords remain exposed in the configuration.
+
+hasIssue=true | enable password cisco
+why: Legacy enable password is used instead of the stronger enable secret mechanism.
+
+hasIssue=false | interface GigabitEthernet0/0 ->  ip address 192.168.10.1 255.255.255.0
+why: No planned security policy or control-logic error.
+
+hasIssue=false | interface GigabitEthernet0/1 ->  ip address 192.168.20.1 255.255.255.0
+why: No planned security policy or control-logic error.
+
+hasIssue=false | interface GigabitEthernet0/1 ->  ip access-group 110 in
+why: Applying an ACL is not itself an error; the planned error is shadowing inside ACL 110.
+
+hasIssue=false | interface GigabitEthernet0/2 ->  no ip address
+why: No planned security policy or control-logic error.
+
+hasIssue=false | interface GigabitEthernet0/2 ->  shutdown
+why: No planned security policy or control-logic error.
+
+hasIssue=false | interface Vlan1 ->  no ip address
+why: No planned security policy or control-logic error in this scenario.
+
+hasIssue=false | interface Vlan1 ->  shutdown
+why: No planned security policy or control-logic error in this scenario.
+
+hasIssue=true | access-list 110 permit ip any any
+why: This broad permit rule shadows the later SSH deny rule.
+
+hasIssue=true | access-list 110 deny tcp any any eq 22
+why: The SSH deny rule is ineffective because the earlier permit ip any any matches first.
+
+hasIssue=true | line con 0 ->  password admin123
+why: Console password is stored as plaintext and is weak.
+
+hasIssue=false | line con 0 ->  login
+why: The login command correctly enables console authentication; the issue is the separate weak plaintext password and disabled password encryption.
+
+hasIssue=false | line aux 0
+why: AUX access is not one of the planned errors in this scenario.
+
+hasIssue=true | line vty 0 4 ->  password telnet123
+why: VTY password is stored as plaintext, is weak, and supports insecure remote access.
+
+hasIssue=true | line vty 0 4 ->  login
+why: The VTY block lacks transport input ssh and access-class controls, so remote administrative access is not restricted by protocol or source.
