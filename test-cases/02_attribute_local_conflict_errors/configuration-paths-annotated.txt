@@ -1,47 +1,47 @@
 hasIssue=false | no service password-encryption
-why: Not part of the planned attribute or local conflict errors in this scenario.
+why: Nie jest częścią zaplanowanych błędów atrybutów ani lokalnych konfliktów w tym scenariuszu.
 
 hasIssue=false | interface GigabitEthernet0/0 ->  ip address 10.1.1.1 255.255.255.0
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=false | interface GigabitEthernet0/0 ->  ip nat inside
-why: This is valid context for NAT, but is not itself the planned error.
+why: Jest to prawidłowy kontekst dla NAT, ale samo w sobie nie stanowi zaplanowanego błędu.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip address 10.2.2.1 255.255.255.0
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip nat inside
-why: This is valid context for NAT, but is not itself the planned error.
+why: Jest to prawidłowy kontekst dla NAT, ale samo w sobie nie stanowi zaplanowanego błędu.
 
 hasIssue=false | interface GigabitEthernet0/2 ->  ip address 192.168.20.1 255.255.255.0
-why: The address assignment is valid; it is context for the conflicts caused by the separate shutdown command.
+why: Przypisanie adresu jest prawidłowe; stanowi kontekst dla konfliktów powodowanych przez oddzielne polecenie shutdown.
 
 hasIssue=true | interface GigabitEthernet0/2 ->  shutdown
-why: The interface associated with the OSPF network and default route is administratively disabled.
+why: Interfejs powiązany z siecią OSPF i trasą domyślną jest administracyjnie wyłączony.
 
 hasIssue=false | interface Vlan1 ->  no ip address
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=false | interface Vlan1 ->  shutdown
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=true | router ospf 1 ->  network 192.168.20.0 0.0.0.255 area 0
-why: OSPF advertises a network associated with an administratively disabled interface.
+why: OSPF rozgłasza sieć powiązaną z administracyjnie wyłączonym interfejsem.
 
 hasIssue=true | ip nat inside source list 1 interface GigabitEthernet0/2 overload
-why: NAT configuration is incomplete because no interface has ip nat outside.
+why: Konfiguracja NAT jest niekompletna, ponieważ żaden interfejs nie ma ustawienia ip nat outside.
 
 hasIssue=true | ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/2 
-why: Default route points to the administratively disabled GigabitEthernet0/2.
+why: Trasa domyślna wskazuje na administracyjnie wyłączony interfejs GigabitEthernet0/2.
 
 hasIssue=false | access-list 1 permit 10.1.1.0 0.0.0.255
-why: The ACL is valid context for NAT and is not itself a planned error.
+why: Lista ACL stanowi prawidłowy kontekst dla NAT i sama w sobie nie jest zaplanowanym błędem.
 
 hasIssue=false | line con 0
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=false | line aux 0
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.
 
 hasIssue=false | line vty 0 4 ->  login
-why: No planned attribute or local conflict.
+why: Brak zaplanowanego błędu atrybutu ani lokalnego konfliktu.

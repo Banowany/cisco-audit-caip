@@ -1,47 +1,47 @@
 hasIssue=true | no service password-encryption
-why: Password encryption is disabled, so line passwords remain exposed in the configuration.
+why: Szyfrowanie haseł jest wyłączone, dlatego hasła w sekcjach line pozostają jawne w konfiguracji.
 
 hasIssue=true | enable password cisco
-why: Legacy enable password is used instead of the stronger enable secret mechanism.
+why: Używane jest starsze hasło enable zamiast silniejszego mechanizmu enable secret.
 
 hasIssue=false | interface GigabitEthernet0/0 ->  ip address 192.168.10.1 255.255.255.0
-why: No planned security policy or control-logic error.
+why: Brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip address 192.168.20.1 255.255.255.0
-why: No planned security policy or control-logic error.
+why: Brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip access-group 110 in
-why: Applying an ACL is not itself an error; the planned error is shadowing inside ACL 110.
+why: Zastosowanie listy ACL samo w sobie nie jest błędem; zaplanowanym błędem jest przesłanianie reguł wewnątrz listy ACL 110.
 
 hasIssue=false | interface GigabitEthernet0/2 ->  no ip address
-why: No planned security policy or control-logic error.
+why: Brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=false | interface GigabitEthernet0/2 ->  shutdown
-why: No planned security policy or control-logic error.
+why: Brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=false | interface Vlan1 ->  no ip address
-why: No planned security policy or control-logic error in this scenario.
+why: W tym scenariuszu brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=false | interface Vlan1 ->  shutdown
-why: No planned security policy or control-logic error in this scenario.
+why: W tym scenariuszu brak zaplanowanego błędu polityki bezpieczeństwa ani logiki sterowania.
 
 hasIssue=true | access-list 110 permit ip any any
-why: This broad permit rule shadows the later SSH deny rule.
+why: Ta szeroka reguła permit przesłania późniejszą regułę deny dla SSH.
 
 hasIssue=true | access-list 110 deny tcp any any eq 22
-why: The SSH deny rule is ineffective because the earlier permit ip any any matches first.
+why: Reguła deny dla SSH jest nieskuteczna, ponieważ wcześniejsza reguła permit ip any any dopasowuje się jako pierwsza.
 
 hasIssue=true | line con 0 ->  password admin123
-why: Console password is stored as plaintext and is weak.
+why: Hasło konsoli jest przechowywane w postaci jawnego tekstu i jest słabe.
 
 hasIssue=false | line con 0 ->  login
-why: The login command correctly enables console authentication; the issue is the separate weak plaintext password and disabled password encryption.
+why: Polecenie login prawidłowo włącza uwierzytelnianie konsoli; problemem jest oddzielne słabe hasło zapisane jawnym tekstem oraz wyłączone szyfrowanie haseł.
 
 hasIssue=false | line aux 0
-why: AUX access is not one of the planned errors in this scenario.
+why: Dostęp AUX nie należy do zaplanowanych błędów w tym scenariuszu.
 
 hasIssue=true | line vty 0 4 ->  password telnet123
-why: VTY password is stored as plaintext, is weak, and supports insecure remote access.
+why: Hasło VTY jest przechowywane w postaci jawnego tekstu, jest słabe i umożliwia niezabezpieczony dostęp zdalny.
 
 hasIssue=true | line vty 0 4 ->  login
-why: The VTY block lacks transport input ssh and access-class controls, so remote administrative access is not restricted by protocol or source.
+why: W bloku VTY brakuje ustawień transport input ssh oraz kontroli access-class, dlatego zdalny dostęp administracyjny nie jest ograniczony według protokołu ani źródła.

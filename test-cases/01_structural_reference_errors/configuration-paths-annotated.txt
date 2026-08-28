@@ -1,56 +1,56 @@
 hasIssue=false | no service password-encryption
-why: This command is not part of the planned structural or reference errors in this scenario.
+why: To polecenie nie jest częścią zaplanowanych błędów strukturalnych ani błędów odwołań w tym scenariuszu.
 
 hasIssue=true | interface GigabitEthernet0/1 ->  ip access-group 100 in
-why: Interface uses ACL 100, but ACL 100 is not defined.
+why: Interfejs używa listy ACL 100, ale lista ACL 100 nie jest zdefiniowana.
 
 hasIssue=false | interface GigabitEthernet0/0 ->  ip address 10.0.0.1 255.255.255.0
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | interface GigabitEthernet0/0 ->  ip nat outside
-why: Correct NAT outside designation; no planned error.
+why: Prawidłowe oznaczenie NAT outside; brak zaplanowanego błędu.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip address 192.168.1.1 255.255.255.0
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | interface GigabitEthernet0/1 ->  ip nat inside
-why: Correct NAT inside designation; no planned error.
+why: Prawidłowe oznaczenie NAT inside; brak zaplanowanego błędu.
 
 hasIssue=false | interface GigabitEthernet0/2 ->  no ip address
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | interface GigabitEthernet0/2 ->  shutdown
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | interface Vlan1 ->  no ip address
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | interface Vlan1 ->  shutdown
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=true | ip nat inside source list NAT_TRAFFIC interface GigabitEthernet0/0 overload
-why: NAT references the undefined ACL or object NAT_TRAFFIC.
+why: Konfiguracja NAT odwołuje się do niezdefiniowanej listy ACL lub obiektu NAT_TRAFFIC.
 
 hasIssue=true | access-list 150 remark Legacy Internet Edge Filter
-why: ACL 150 is defined but is not used anywhere in the configuration.
+why: Lista ACL 150 jest zdefiniowana, ale nie jest nigdzie używana w konfiguracji.
 
 hasIssue=true | access-list 150 deny tcp any any eq telnet
-why: This entry belongs to the defined but unused ACL 150.
+why: Ten wpis należy do zdefiniowanej, ale nieużywanej listy ACL 150.
 
 hasIssue=true | access-list 150 deny tcp any any eq ftp
-why: This entry belongs to the defined but unused ACL 150.
+why: Ten wpis należy do zdefiniowanej, ale nieużywanej listy ACL 150.
 
 hasIssue=true | access-list 150 deny tcp any any eq www
-why: This entry belongs to the defined but unused ACL 150.
+why: Ten wpis należy do zdefiniowanej, ale nieużywanej listy ACL 150.
 
 hasIssue=true | access-list 150 permit ip any any
-why: This entry belongs to the defined but unused ACL 150.
+why: Ten wpis należy do zdefiniowanej, ale nieużywanej listy ACL 150.
 
 hasIssue=false | line con 0
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | line aux 0
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
 
 hasIssue=false | line vty 0 4 ->  login
-why: No planned structural or reference error.
+why: Brak zaplanowanego błędu strukturalnego ani błędu odwołania.
