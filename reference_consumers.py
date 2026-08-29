@@ -40,7 +40,8 @@ def consume_ip_nat(arguments: List[str]) -> List[ReferenceKey]:
     Consume references from ``ip nat`` commands.
 
     - ``ip nat inside source list <acl-name> interface <intf> overload``
-      consumes an Access List reference via ``<acl-name>``.
+      consumes an Access List reference via ``<acl-name>`` and an Interface
+      reference via ``<intf>``.
     - ``ip nat inside`` / ``ip nat outside`` (interface marking) consumes
       nothing.
 
@@ -48,7 +49,7 @@ def consume_ip_nat(arguments: List[str]) -> List[ReferenceKey]:
         arguments: The parsed arguments.
 
     Returns:
-        A list with a single ``("access-list", <acl-name>)`` tuple if the
+        A list containing the Access List and Interface references if the
         pattern matches, otherwise an empty list.
     """
     # Pattern: inside source list <acl-name> interface <interface> overload
@@ -59,7 +60,10 @@ def consume_ip_nat(arguments: List[str]) -> List[ReferenceKey]:
         and arguments[2] == "list"
         and arguments[4] == "interface"
     ):
-        return [("access-list", arguments[3])]
+        return [
+            ("access-list", arguments[3]),
+            ("interface", arguments[5]),
+        ]
 
     return []
 
